@@ -1,0 +1,28 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: result
+    version: green
+  name: result-green
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: result
+      version: green
+  template:
+    metadata:
+      labels:
+        app: result
+        version: green
+    spec:
+      containers:
+      - name: result
+        image: result-app:v2.0  # New version to deploy
+        
+        ports:
+        - containerPort: 80
+          name: http
+          protocol: TCP
