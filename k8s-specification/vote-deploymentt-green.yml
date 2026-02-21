@@ -1,0 +1,25 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: vote
+    version: green
+  name: vote-green
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: vote
+      version: green
+  template:
+    metadata:
+      labels:
+        app: vote
+        version: green
+    spec:
+      containers:
+      - image: vote-app:appv2
+        name: vote
+        ports:
+        - containerPort: 80
+          name: vote
