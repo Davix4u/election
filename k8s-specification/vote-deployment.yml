@@ -3,19 +3,22 @@ kind: Deployment
 metadata:
   labels:
     app: vote
+    version: blue
   name: vote
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: vote
+      version: blue
   template:
     metadata:
       labels:
         app: vote
+        version: blue
     spec:
       containers:
-      - image: dockersamples/examplevotingapp_vote
+      - image: vote-app:appv1.0
         name: vote
         ports:
         - containerPort: 80
