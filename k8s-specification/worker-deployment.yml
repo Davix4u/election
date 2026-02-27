@@ -3,17 +3,19 @@ kind: Deployment
 metadata:
   labels:
     app: worker
+    version: blue
   name: worker
 spec:
   replicas: 1
   selector:
     matchLabels:
       app: worker
+      version: blue
   template:
     metadata:
       labels:
         app: worker
     spec:
       containers:
-      - image: dockersamples/examplevotingapp_worker
+      - image: worker-green:appv2
         name: worker
