@@ -1,14 +1,30 @@
-apiVersion: v1
-kind: Service
+apiVersion: apps/v1
+kind: Deployment
 metadata:
   labels:
-    app: db
-  name: db
+    app: redis
+  name: redis
 spec:
-  type: ClusterIP
-  ports:
-  - name: "db-service"
-    port: 5432
-    targetPort: 5432
+  replicas: 1
   selector:
-    app: db
+    matchLabels:
+      app: redis
+      version: blue
+  template:
+    metadata:
+      labels:
+        app: redis
+        version: blue
+    spec:
+      containers:
+      - image: redis-blue:appv2
+        name: redis
+        ports:
+        - containerPort: 6379
+          name: redis
+        volumeMounts:
+        - mountPath: /data
+          name: redis-data
+      volumes:
+      - name: redis-data
+        emptyDir: {} 
