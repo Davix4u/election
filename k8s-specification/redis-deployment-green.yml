@@ -1,0 +1,31 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  labels:
+    app: redis
+    version:  green
+  name: redis-green
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      app: redis
+      version: green
+  template:
+    metadata:
+      labels:
+        app: redis
+        version: green
+    spec:
+      containers:
+      - image: redis-app:appv2
+        name: redis
+        ports:
+        - containerPort: 6379
+          name: redis
+        volumeMounts:
+        - mountPath: /data
+          name: redis-data
+      volumes:
+      - name: redis-data
+        emptyDir: {} 
