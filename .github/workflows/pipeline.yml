@@ -1,0 +1,55 @@
+# ============================================================
+# CI/CD Workflow with Security + Non-Blocking Scans + Deployment
+# ============================================================
+
+name: CI/CD - Build, Scan & Deploy
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+permissions:
+  contents: read
+  security-events: write
+
+env:
+  SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+jobs:
+
+# ============================================================
+# STAGE 1: PRE-BUILD SECURITY
+# ============================================================
+
+  pre-build-security:
+    name: 🔒 Pre-Build Security Checks
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: GitLeaks Scan (Non-blocking)
+        run: |
+          echo "🔑 Running GitLeaks..."
+          gitleaks detect --source . --verbose --exit-code 0 || true
+
+      - name: Bandit Scan (Python)
+        run: |
+          pip install bandit --quiet
+          if [ -d vote ]; then
+            bandit -r ./vote -ll -f screen || true
+          fi
+      - name: ESLint Scan (Node
+        run: |
+          if [ -d result ]; then
+            cd result
+            npm install --silent || true
+            npm install eslint eslint-plugin-security --silent || true
+
+            echo '{ "plugins": ["security"], "extends": ["plugin:security/recommended"] }' > .eslintrc.json
+
+            npx eslint . || true
+            cd ..
+          fi
