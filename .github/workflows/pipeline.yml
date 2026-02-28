@@ -31,7 +31,7 @@ jobs:
           echo "🔑 Running GitLeaks..."
           gitleaks detect --source . --verbose --exit-code 0 || true
           
-      - name: ESLint Scan (Node
+      - name: ESLint Scan (Node)
         run: |
           if [ -d result ]; then
             cd result
@@ -63,9 +63,3 @@ jobs:
             snyk container test vote-app:appv1 || true
           fi
 
-
-            echo '{ "plugins": ["security"], "extends": ["plugin:security/recommended"] }' > .eslintrc.json
-
-            npx eslint . || true
-            cd ..
-          fi
