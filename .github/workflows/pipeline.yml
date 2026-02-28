@@ -1,9 +1,8 @@
-
+# ============================================================
 # CI/CD Workflow with Security + Non-Blocking Scans + Deployment
 # ============================================================
 
 name: CI/CD - Build, Scan & Deploy
-
 on:
   push:
     branches: [ main, develop ]
