@@ -42,6 +42,50 @@ jobs:
 # STAGE 2: BUILD & SCAN VOTE
 # ============================================================
 
+# ============================================================
+# CI/CD Workflow with Security + Non-Blocking Scans + Deployment
+# ============================================================
+
+name: CI/CD - Build, Scan & Deploy
+
+on:
+  push:
+    branches: [ main, develop ]
+  pull_request:
+    branches: [ main ]
+
+env:
+  SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
+
+jobs:
+
+# ============================================================
+# STAGE 1: PRE-BUILD SECURITY
+# ============================================================
+
+  pre-build-security:
+    name: 🔒 Pre-Build Security Checks
+    runs-on: self-hosted
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: GitLeaks Scan (Non-blocking)
+        run: |
+          echo "🔑 Running GitLeaks..."
+          gitleaks detect --source . --verbose --exit-code 0 || true
+          
+      - name: ESLint Scan (Node)
+        run: |
+          if [ -d result ]; then
+            cd result
+            npm install --silent || true
+            npm install eslint eslint-plugin-security --silent || true
+
+# ============================================================
+# STAGE 2: BUILD & SCAN VOTE
+# ============================================================
+
    build-vote:
     runs-on: self-hosted
     needs: pre-build-security
