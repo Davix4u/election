@@ -26,9 +26,9 @@ jobs:
     steps:
       - uses: actions/checkout@v4
 
-      - name: GitLeaks Scan (Non-blocking)
+      - name: GitLeaks Scan 
         run: |
-          echo "🔑 Running GitLeaks..."
+          echo " Running GitLeaks..."
           gitleaks detect --source . --verbose --exit-code 0 || true
           
       - name: ESLint Scan (Node)
@@ -38,72 +38,37 @@ jobs:
             npm install --silent || true
             npm install eslint eslint-plugin-security --silent || true
 
-# ============================================================
-# STAGE 2: BUILD & SCAN VOTE
-# ============================================================
+            echo '{ "plugins": ["security"], "extends": ["plugin:security/recommended"] }' > .eslintrc.json
 
-# ============================================================
-# CI/CD Workflow with Security + Non-Blocking Scans + Deployment
-# ============================================================
+            npx eslint . || true
+            cd ..
+          fi
 
-name: CI/CD - Build, Scan & Deploy
 
-on:
-  push:
-    branches: [ main, develop ]
-  pull_request:
-    branches: [ main ]
+# ==================================================================================================
+# STAGE 2: BUILD SCAN VOTE
+# ==================================================================================================
 
-env:
-  SNYK_TOKEN: ${{ secrets.SNYK_TOKEN }}
-
-jobs:
-
-# ============================================================
-# STAGE 1: PRE-BUILD SECURITY
-# ============================================================
-
-  pre-build-security:
-    name: 🔒 Pre-Build Security Checks
-    runs-on: self-hosted
-
-    steps:
-      - uses: actions/checkout@v4
-
-      - name: GitLeaks Scan (Non-blocking)
-        run: |
-          echo "🔑 Running GitLeaks..."
-          gitleaks detect --source . --verbose --exit-code 0 || true
-          
-      - name: ESLint Scan (Node)
-        run: |
-          if [ -d result ]; then
-            cd result
-            npm install --silent || true
-            npm install eslint eslint-plugin-security --silent || true
-
-# ============================================================
-# STAGE 2: BUILD & SCAN VOTE
-# ============================================================
-
-   build-vote:
+  build-vote:
     runs-on: self-hosted
     needs: pre-build-security
 
     steps:
-      - uses: actions/checkout@v4
-
-      - name: Build Vote Image
+      - uses: actions/checkout@v4 
+      - name: build vote images
         run: docker build -t vote-app:appv1 ./vote
 
-      - name: Trivy Scan (Non-blocking)
+      - name: trivy scan continue-on-error
         run: |
-          trivy image --severity HIGH,CRITICAL --exit-code 0 vote-app:appv1 || true
+          trivy images --severity HIGH, CRITICAL --exit-code 0 vote-app:appv1 || true
 
-      - name: Snyk Scan
-        run: |
-          if [ -n "$SNYK_TOKEN" ]; then
-            snyk auth $SNYK_TOKEN
-            snyk container test vote-app:appv1 || true
+      - name: synk scan
+        run: | 
+          if [ -n "$SNYK_TOKEN" }; then
+            synk auth $SNYK_TOKEN
+            synk container test vote-app:appv1 || true
           fi
+  
+  
+         
 
