@@ -65,8 +65,11 @@ jobs:
       
       - name: build vote images
         run: | 
-          cd vote
-          docker build -t vote-app:appv1 .
+          docker build \
+            -f vote/templates/Dockerfile \
+            -t vote-app:appv1 \
+            ./vote/templates
+          
 
       - name: trivy scan continue-on-error
         run: |
