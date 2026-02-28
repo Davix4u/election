@@ -38,6 +38,32 @@ jobs:
             npm install --silent || true
             npm install eslint eslint-plugin-security --silent || true
 
+# ============================================================
+# STAGE 2: BUILD & SCAN VOTE
+# ============================================================
+
+   build-vote:
+    runs-on: self-hosted
+    needs: pre-build-security
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Build Vote Image
+        run: docker build -t vote-app:appv1 ./vote
+
+      - name: Trivy Scan (Non-blocking)
+        run: |
+          trivy image --severity HIGH,CRITICAL --exit-code 0 vote-app:appv1 || true
+
+      - name: Snyk Scan
+        run: |
+          if [ -n "$SNYK_TOKEN" ]; then
+            snyk auth $SNYK_TOKEN
+            snyk container test vote-app:appv1 || true
+          fi
+
+
             echo '{ "plugins": ["security"], "extends": ["plugin:security/recommended"] }' > .eslintrc.json
 
             npx eslint . || true
