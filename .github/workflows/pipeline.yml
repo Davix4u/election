@@ -55,6 +55,14 @@ jobs:
 
     steps:
       - uses: actions/checkout@v4 
+      - name: " current directory "
+        run: |  
+          echo "Current directory:"
+          pwd
+          echo "Contents of vote folder:"
+          ls -la vote
+      
+      
       - name: build vote images
         run: | 
           cd vote
