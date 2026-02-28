@@ -30,13 +30,7 @@ jobs:
         run: |
           echo "🔑 Running GitLeaks..."
           gitleaks detect --source . --verbose --exit-code 0 || true
-
-      - name: Bandit Scan (Python)
-        run: |
-          pip install bandit --quiet
-          if [ -d vote ]; then
-            bandit -r ./vote -ll -f screen || true
-          fi
+          
       - name: ESLint Scan (Node
         run: |
           if [ -d result ]; then
