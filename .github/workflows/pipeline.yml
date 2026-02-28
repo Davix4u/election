@@ -105,7 +105,7 @@ jobs:
           trivy images --severity HIGH,CRITICAL --exit-code 0 result-app:appv1 || true
 
       - name: npm audit (non blocking)
-        #run: |
+        run: |
           cd result
           npm install --silient || true
           npm audit || true
