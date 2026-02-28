@@ -94,8 +94,12 @@ jobs:
       - uses: actions/checkout@v4
 
       - name: build result image
-        run: docker build -t result-app:appv1 ./result
-
+        run: |
+          docker build \
+            -f result/views/stylesheets/Dockerfile \
+            -t result-app:appv1 \
+            ./result/views/stylesheets
+            
       - name: trivy scan  non blocking
         run: |
           trivy images --severity HIGH,CRITICAL --exit-code 0 result-app:appv1 || true
@@ -106,6 +110,25 @@ jobs:
           npm install --silient || true
           npm audit || true
           cd ..
+
+#==========================================================
+# STAGE 4: BUILD SCAN WORKER
+# =======================================================
+
+  build-worker:
+    runs-on: self-hosted
+    needs: pre-build-security
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: build worker images
+        run: docker build -t worker-app:appv1 ./worker
+
+      - name: trivy scan continue
+        run: |
+          trivy image --severity HIGH CRITICAL --exit-code 0 worker-app:appv1 || true
+      - 
           
   
   
