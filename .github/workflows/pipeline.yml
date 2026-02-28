@@ -56,7 +56,8 @@ jobs:
     steps:
       - uses: actions/checkout@v4 
       - name: build vote images
-        run: docker build -t vote-app:appv1 -f vote/Dockerfile .
+        run: | 
+          docker build -t vote-app:appv1 -f vote/Dockerfile .
 
       - name: trivy scan continue-on-error
         run: |
