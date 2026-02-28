@@ -81,6 +81,32 @@ jobs:
             synk auth $SNYK_TOKEN
             synk container test vote-app:appv1 || true
           fi
+
+# ===================================================================================
+# STAGE 3: BUILD SCAN RESULT
+# ====================================================================================
+
+  build-result:
+    runs-on: self-hosted
+    needs: pre-build-security
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: build result image
+        run: docker build -t result-app:appv1 ./result
+
+      - name: trivy scan  non blocking
+        run: |
+          trivy images --severity HIGH,CRITICAL --exit-code 0 result-app:appv1 || true
+
+      - name: npm audit (non blocking)
+        run: |
+          cd result
+          npm install --silient || true
+          npm audit || true
+          cd ..
+          
   
   
          
